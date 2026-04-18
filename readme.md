@@ -48,3 +48,8 @@ Rebuild the docker image and restart the container after creating the `.env` fil
 ### Use Open-WebUI
 
 Open `http://localhost:3000/` and create an account to use the Open-WebUI interface.
+
+
+## More Info
+
+Watch this vid to learn about ollama: https://youtu.be/Wjrdr0NU4Sk?si=0g5PgAFnDbLGJFyO
