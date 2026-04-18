@@ -3,14 +3,15 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-#    image: ollama-custom:latest
     container_name: ollama
     ports:
       - "${OLLAMA_PORT:-11434}:11434"
     volumes:
       - ./ollama:/root/.ollama
-      - ./docker/start-ollama.sh:/start-ollama.sh
-    entrypoint: ["/bin/bash", "/start-ollama.sh"]
+    # enable to auto download initial llm model on startup
+    #  - ./docker/auto-llm.sh:/auto-llm.sh
+    #entrypoint: ["/bin/bash", "/auto-llm.sh"]
     restart: unless-stopped
-#    cpus: 8
+    # enable for older CPU only machines
+    #cpus: 8
 
