@@ -12,6 +12,6 @@ services:
     #  - ./docker/auto-llm.sh:/auto-llm.sh
     #entrypoint: ["/bin/bash", "/auto-llm.sh"]
     restart: unless-stopped
-    # enable for older CPU only machines
+    # enable for older CPU only machines (no GPU)
     #cpus: 8
 
