@@ -1,6 +1,8 @@
 # Readme
 
-This is an experimental LLM server for my phpStorm ai instances.
+This is an experimental LLM server to integrate with PhpStorm AI assistant.
+
+Be sure to have enough disk space, 20-50Gb is recommended for all the docker and LLM images.
 
 In phpStorm, setup docker and execute the docker-compose.yml.
 
@@ -43,3 +45,6 @@ Rebuild the docker image and restart the container after creating the `.env` fil
 - **Set Server Address:** If Docker is on your local machine, use http://localhost:11434.
 - **Select Model:** Once connected, you can select your pulled models from the dropdown menu in the AI Assistant chat panel. 
 
+### Use Open-WebUI
+
+Open `http://localhost:3000/` and create an account to use the Open-WebUI interface.
