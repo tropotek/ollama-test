@@ -11,10 +11,11 @@ search:
   autocomplete: 'duckduckgo'
   formats:
     - html
+    - json
 
 server:
   # Is overwritten by ${SEARXNG_SECRET}
-  secret_key: "1232131321asdads"
+  secret_key: "create_a_secret_key_add_it_here"
   limiter: false
   image_proxy: true
   # public URL of the instance, to ensure correct inbound links. Is overwritten

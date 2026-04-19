@@ -37,19 +37,19 @@ services:
     depends_on:
       - ollama
 
-# TODO: figure out how to use searxng with docker-compose
-#  searxng:
-#    image: searxng/searxng:latest
-#    container_name: searxng
-#    ports:
-#      - "${SEARXNG_PORT:-18081}:8081"
-#    volumes:
-#      - ./docker/searxng-settings.yml:/etc/searxng/settings.yml:ro
-#      - searxng_data:/app/data
-#    environment:
-#      - 'SEARXNG_PORT=8081'
-#      - 'SEARXNG_BASE_URL=http://searxng:8081/'
-#    restart: unless-stopped
+  # enable searxng in open-webui if you want to use it `http://localhost:18081/search?q=<query>`
+  searxng:
+    image: searxng/searxng:latest
+    container_name: searxng
+    ports:
+      - "${SEARXNG_PORT:-18081}:8081"
+    volumes:
+      - ./docker/searxng-settings.yml:/etc/searxng/settings.yml:ro
+      - searxng_data:/app/data
+    environment:
+      - 'SEARXNG_PORT=8081'
+      - 'SEARXNG_BASE_URL=http://searxng:8081/'
+    restart: unless-stopped
 
 volumes:
   ollama_data:
