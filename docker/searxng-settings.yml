@@ -7,7 +7,7 @@ general:
   instance_name: "SearXNG"
 
 search:
-  safe_search: 2
+  safe_search: 0  # 0: None, 1: Moderate, 2: Strict
   autocomplete: 'duckduckgo'
   formats:
     - html

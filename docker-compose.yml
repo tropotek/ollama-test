@@ -7,6 +7,7 @@ services:
     ports:
       - "${OLLAMA_PORT:-11434}:11434"
     volumes:
+      - ./:/projects
       - ./ollama:/root/.ollama
 # uncomment the line if you want to use a volume for the data
 #      - ollama_data:/root/.ollama
@@ -24,6 +25,8 @@ services:
               count: all
               capabilities: [gpu]
 
+  # access the local url from your browser: http://localhost:3000/
+  # in the Admin Connections use the URL: http://ollama:11434/ URL
   open-webui:
     image: ghcr.io/open-webui/open-webui:main
     container_name: open-webui
@@ -33,11 +36,12 @@ services:
     environment:
       - 'OLLAMA_BASE_URL=http://ollama:${OLLAMA_PORT:-11434}'
     volumes:
+      - ./:/projects
       - open-webui_data:/app/backend/data
     depends_on:
       - ollama
 
-  # enable searxng in open-webui if you want to use it `http://localhost:18081/search?q=<query>`
+  # enable searxng in Admin Web search settings URL: `http://searxng:8081/search?q=<query>`
   searxng:
     image: searxng/searxng:latest
     container_name: searxng
@@ -51,7 +55,24 @@ services:
       - 'SEARXNG_BASE_URL=http://searxng:8081/'
     restart: unless-stopped
 
+  # Enable open-terminal in Admin Integrations Open terminal: 'http://open-terminal:18000' and secret from your .env
+  open-terminal:
+    image: ghcr.io/open-webui/open-terminal:latest
+    container_name: open-terminal
+    ports:
+      - "${OPENTERMINAL_PORT:-9900}:18000"
+    environment:
+      - "OPEN_TERMINAL_API_KEY=${OPENTERMINAL_SECRET:-your-secret-password-here}"
+#      - "OPEN_TERMINAL_PACKAGES="
+#      - "OPEN_TERMINAL_PIP_PACKAGES="
+#      - "OPEN_TERMINAL_NPM_PACKAGES="
+    volumes:
+      - ./docker/open-terminl-config.toml:/etc/open-terminal/config.toml:ro
+      - open-terminal:/home/user
+    restart: unless-stopped
+
 volumes:
   ollama_data:
   open-webui_data:
   searxng_data:
+  open-terminal:
