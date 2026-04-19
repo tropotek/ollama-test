@@ -13,17 +13,16 @@ services:
     restart: unless-stopped
     # enable for older CPU only machines (no GPU)
     #cpus: 8
-
     # To use Nvidia GPU's you will need to install the "NVIDIA Container Toolkit".
     # https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html
     # If using a GPU (NVIDIA), uncomment the lines below):
-    #deploy:
-    #  resources:
-    #    reservations:
-    #      devices:
-    #        - driver: nvidia
-    #          count: all
-    #          capabilities: [gpu]
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
 
   open-webui:
     image: ghcr.io/open-webui/open-webui:main
@@ -33,21 +32,26 @@ services:
       - "${OLLAMA_UI_PORT:-3000}:8080"
     environment:
       - 'OLLAMA_BASE_URL=http://ollama:${OLLAMA_PORT:-11434}'
-      - 'SEQRXNG_BASE_URL=http://seqrxng:${SEQRXNG_PORT:-18080}'
     volumes:
       - open-webui_data:/app/backend/data
     depends_on:
       - ollama
 
-  seqrxng:
-    image: ghcr.io/seqrxng/seqrxng:latest
-    container_name: seqrxng
-    ports:
-      - "${SEQRXNG_PORT:-18080}:80"
-    volumes:
-      - seqrxng_data:/app/data
-    restart: unless-stopped
+# TODO: figure out how to use searxng with docker-compose
+#  searxng:
+#    image: searxng/searxng:latest
+#    container_name: searxng
+#    ports:
+#      - "${SEARXNG_PORT:-18081}:8081"
+#    volumes:
+#      - ./docker/searxng-settings.yml:/etc/searxng/settings.yml:ro
+#      - searxng_data:/app/data
+#    environment:
+#      - 'SEARXNG_PORT=8081'
+#      - 'SEARXNG_BASE_URL=http://searxng:8081/'
+#    restart: unless-stopped
 
 volumes:
   ollama_data:
   open-webui_data:
+  searxng_data:
