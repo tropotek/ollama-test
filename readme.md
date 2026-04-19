@@ -49,6 +49,7 @@ Rebuild the docker image and restart the container after creating the `.env` fil
 
 Open `http://localhost:3000/` and create an account to use the Open-WebUI interface.
 
+As a bonus you can access the searxng page at `http://localhost:18081/`  
 
 ## More Info
 
