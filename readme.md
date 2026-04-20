@@ -54,3 +54,9 @@ As a bonus you can access the searxng page at `http://localhost:18081/`
 ## More Info
 
 Watch this vid to learn about ollama: https://youtu.be/Wjrdr0NU4Sk?si=0g5PgAFnDbLGJFyO
+
+#### Additional Features:
+- **Open-WebUI Interface:** Access at `http://localhost:3000/`.
+- **Searxng Page:** Available at `http://localhost:18081/`.
+
+
