@@ -49,7 +49,11 @@ Rebuild the docker image and restart the container after creating the `.env` fil
 
 Open `http://localhost:3000/` and create an account to use the Open-WebUI interface.
 
-As a bonus you can access the searxng page at `http://localhost:18081/`  
+As a bonus you can access the searxng page at `http://localhost:18081/`
+
+#### Enable SearXng in open-webui
+
+Go to admin settings `Web Search` an select `searxng` and set the url to `http://searxng:8081/search?q=<query>`
 
 ## More Info
 

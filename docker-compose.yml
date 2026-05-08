@@ -13,7 +13,7 @@ services:
 #      - ollama_data:/root/.ollama
     restart: unless-stopped
     # enable for older CPU only machines (no GPU)
-    #cpus: 8
+    #cpus: 4
     # To use Nvidia GPU's you will need to install the "NVIDIA Container Toolkit".
     # https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html
     # If using a GPU (NVIDIA), uncomment the lines below):
