@@ -64,3 +64,7 @@ Watch this vid to learn about ollama: https://youtu.be/Wjrdr0NU4Sk?si=0g5PgAFnDb
 - **Searxng Page:** Available at `http://localhost:18081/`.
 
 
+## Notes:
+
+Best test LLM's using Nvidia 20xx series with 8g :
+- `networkjohnny/deepseek-coder-v2-lite-base-q4_k_m-gguf:latest` 
