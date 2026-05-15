@@ -34,6 +34,24 @@ services:
       retries: 5
       start_period: 30s
 
+# under construction, note: do not like having to mount the project folder here??? This should be installed in the projects compose file ?
+#  opencode:
+#    image: ghcr.io/opencode-ai/opencode:latest
+#    container_name: opencode-agent
+#    volumes:
+#      # Mount your project code so OpenCode can read/edit it
+#      - ./your-project-path:/workspace
+#      # Optional: Persist OpenCode configuration and authentication
+#      - ~/.config/opencode:/home/op/.config/opencode
+#    working_dir: /workspace
+#    ports:
+#      - "${OPENCODE_PORT:-1234}:1234" # Port for the OpenCode server
+#    environment:
+#      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+#    tty: true
+#    stdin_open: true
+#    command: opencode serve --port 1234
+
   # access the local url from your browser: http://localhost:3000/
   # in the Admin Connections use the URL: http://ollama:11434/ URL
   open-webui:
