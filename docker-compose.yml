@@ -9,14 +9,12 @@ services:
     volumes:
       - ./:/projects
       - ./ollama:/root/.ollama
-    environment:
+#    environment:
 #      - 'OLLAMA_CONTEXT_LENGTH=4096'
-      - 'OLLAMA_CONTEXT_LENGTH=2043'
-# uncomment the line if you want to use a volume for the data
-#      - ollama_data:/root/.ollama
+#      - 'OLLAMA_CONTEXT_LENGTH=2043'
     restart: unless-stopped
     # enable for older CPU only machines (no GPU)
-    #cpus: 4
+    # cpus: 8
     # To use Nvidia GPU's you will need to install the "NVIDIA Container Toolkit".
     # https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html
     # If using a GPU (NVIDIA), uncomment the lines below):
@@ -117,7 +115,6 @@ services:
       start_period: 40s
 
 volumes:
-  ollama_data:
   open-webui_data:
   searxng_data:
   open-terminal:
