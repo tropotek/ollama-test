@@ -9,10 +9,13 @@ services:
     volumes:
       - ./:/projects
       - ./ollama:/root/.ollama
-#    environment:
-#      - 'OLLAMA_CONTEXT_LENGTH=4096'
-#      - 'OLLAMA_CONTEXT_LENGTH=2043'
     restart: unless-stopped
+    environment:
+    #  - OLLAMA_CONTEXT_LENGTH=32768
+    #  - OLLAMA_CONTEXT_LENGTH=16384
+      - OLLAMA_CONTEXT_LENGTH=8192
+    #  - 'OLLAMA_CONTEXT_LENGTH=4096'
+    #  - 'OLLAMA_CONTEXT_LENGTH=2043'
     # enable for older CPU only machines (no GPU)
     # cpus: 8
     # To use Nvidia GPU's you will need to install the "NVIDIA Container Toolkit".
@@ -20,6 +23,9 @@ services:
     # If using a GPU (NVIDIA), uncomment the lines below):
     deploy:
       resources:
+        limits:
+          cpus: '4.0'                # Cap CPU to prevent total system lockups
+          memory: 4G                 # Cap system RAM allocation
         reservations:
           devices:
             - driver: nvidia
@@ -32,61 +38,24 @@ services:
       retries: 5
       start_period: 30s
 
-# under construction, note: do not like having to mount the project folder here??? This should be installed in the projects compose file ?
-#  opencode:
-#    image: ghcr.io/opencode-ai/opencode:latest
-#    container_name: opencode-agent
-#    volumes:
-#      # Mount your project code so OpenCode can read/edit it
-#      - ./your-project-path:/workspace
-#      # Optional: Persist OpenCode configuration and authentication
-#      - ~/.config/opencode:/home/op/.config/opencode
-#    working_dir: /workspace
-#    ports:
-#      - "${OPENCODE_PORT:-1234}:1234" # Port for the OpenCode server
-#    environment:
-#      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
-#    tty: true
-#    stdin_open: true
-#    command: opencode serve --port 1234
-
   # access the local url from your browser: http://localhost:3000/
   # in the Admin Connections use the URL: http://ollama:11434/ URL
   open-webui:
-    image: ghcr.io/open-webui/open-webui:main
+    image: ghcr.io/open-webui/open-webui:latest
     container_name: open-webui
-    restart: unless-stopped
     ports:
       - "${OLLAMA_UI_PORT:-3000}:8080"
-    environment:
-      - 'OLLAMA_BASE_URL=http://ollama:11434'
     volumes:
-      - ./:/projects
-      - open-webui_data:/app/backend/data
-    healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost:8080/health" ]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 30s
-    depends_on:
-      - ollama
-
-  # enable searxng in Admin Web search settings URL: `http://searxng:8081/search?q=<query>`
-  searxng:
-    image: searxng/searxng:latest
-    container_name: searxng
-    ports:
-      - "${SEARXNG_PORT:-18081}:8081"
-    volumes:
-      - ./docker/searxng-settings.yml:/etc/searxng/settings.yml:ro
-      - searxng_data:/app/data
+      - ./docker/open-webui:/app/backend/data
     environment:
-      - 'SEARXNG_PORT=8081'
-      - 'SEARXNG_BASE_URL=http://searxng:8081/'
+      - SEARXNG_PORT=8081
+      - SEARXNG_BASE_URL=http://searxng:8081/
+      - OLLAMA_BASE_URL=http://ollama:11434
+#      - WEBUI_URL=${WEBUI_URL:-http://localhost:3000}
+#      - OPENCODE_SERVER_URL=http://localhost:1234
     restart: unless-stopped
     healthcheck:
-      test: [ "CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:8081/healthz" ]
+      test: [ "CMD", "curl", "-f", "http://localhost:8080/healthz" ]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -99,10 +68,10 @@ services:
     ports:
       - "${OPENTERMINAL_PORT:-9900}:18000"
     environment:
-      - "OPEN_TERMINAL_API_KEY=${OPENTERMINAL_SECRET:-your-secret-password-here}"
-#      - "OPEN_TERMINAL_PACKAGES="
-#      - "OPEN_TERMINAL_PIP_PACKAGES="
-#      - "OPEN_TERMINAL_NPM_PACKAGES="
+      - OPEN_TERMINAL_API_KEY=${OPENTERMINAL_SECRET:-your-secret-password-here}
+#      - OPEN_TERMINAL_PACKAGES=
+#      - OPEN_TERMINAL_PIP_PACKAGES=
+#      - OPEN_TERMINAL_NPM_PACKAGES=
     volumes:
       - ./docker/open-terminal-config.toml:/etc/open-terminal/config.toml:ro
       - open-terminal:/home/user
@@ -114,7 +83,31 @@ services:
       retries: 3
       start_period: 40s
 
+# TODO: do not enable yet.
+#  opencode:
+#    image: ghcr.io/opencode-ai/opencode:latest
+#    container_name: opencode-agent
+#    restart: unless-stopped
+#    volumes:
+#      # Mount your project code so OpenCode can read/edit it
+#      - ./:/workspace
+#      # Optional: Persist OpenCode configuration and authentication
+#      - ./docker/opencode.json:/home/op/.config/opencode
+#      - /root/.cache/ollama:/root/.cache/ollama
+#      - /root/.local/share/ollama:/root/.local/share/ollama
+#    working_dir: /workspace
+#    ports:
+#      - "${OPENCODE_PORT:-1234}:1234"  # Port for the OpenCode server
+#    environment:
+#      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+#      - OLLAMA_BASE_URL=http://ollama:11434/v1
+#    tty: true
+#    stdin_open: true
+#    command: opencode serve --port 1234
+#    depends_on:
+#      ollama:
+#        condition: service_started
+
 volumes:
-  open-webui_data:
   searxng_data:
   open-terminal:

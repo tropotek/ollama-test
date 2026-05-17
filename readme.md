@@ -49,6 +49,20 @@ Rebuild the docker image and restart the container after creating the `.env` fil
 
 Open `http://localhost:3000/` and create an account to use the Open-WebUI interface.
 
+If you access Open WebUI through multiple hostnames (for example `http://192.168.0.7:3000` and `http://ollama.tk`), your browser treats them as different origins and keeps separate local UI/session data.
+
+To keep behavior/settings consistent, use one canonical URL for Open WebUI:
+
+1. Set `WEBUI_URL` in `.env` to your public URL (example: `WEBUI_URL=https://ollama.tk`).
+2. Keep all alternate URLs/IPs redirected by your reverse proxy to that same canonical host.
+3. Recreate the service:
+
+```bash
+docker compose up -d --force-recreate open-webui
+```
+
+Open WebUI data is persisted in `./open-webui` (mounted to `/app/backend/data`) so server-side settings/accounts survive container recreation.
+
 As a bonus you can access the searxng page at `http://localhost:18081/`
 
 #### Enable SearXng in open-webui
@@ -75,7 +89,7 @@ Use the Default Quantization: By default, Ollama downloads the Q4_K_M 4-bit quan
 
 ## Using Opencode
 
-
+https://github.com/p-lemonish/ollama-x-opencode
 
 
 
