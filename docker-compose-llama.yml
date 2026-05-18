@@ -25,3 +25,30 @@ services:
 #      --ctx-size 16216
 #      --ctx-size 4096
   
+
+
+# TODO: do not enable yet. Looks like it is better to run this on the host for now???
+#  opencode:
+#    image: ghcr.io/opencode-ai/opencode:latest
+#    container_name: opencode-agent
+#    restart: unless-stopped
+#    volumes:
+#      # Mount your project code so OpenCode can read/edit it
+#      - ./:/workspace
+#      # Optional: Persist OpenCode configuration and authentication
+#      - ./docker/opencode.json:/home/op/.config/opencode
+#      - /root/.cache/ollama:/root/.cache/ollama
+#      - /root/.local/share/ollama:/root/.local/share/ollama
+#    working_dir: /workspace
+#    ports:
+#      - "${OPENCODE_PORT:-1234}:1234"  # Port for the OpenCode server
+#    environment:
+#      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+#      - OLLAMA_BASE_URL=http://ollama:11434/v1
+#    tty: true
+#    stdin_open: true
+#    command: opencode serve --port 1234
+#    depends_on:
+#      ollama:
+#        condition: service_started
+
