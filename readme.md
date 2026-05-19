@@ -84,6 +84,7 @@ Best test LLM's using Nvidia 20xx series with 8g :
 - `networkjohnny/deepseek-coder-v2-lite-base-q4_k_m-gguf:latest` (not good with opencode) 
 - `qwen2.5-coder:7b`
 - `deepseek-r1:7b`
+- https://huggingface.co/unsloth/Qwen3.5-9B-MTP-GGUF
 
 Use the Default Quantization: By default, Ollama downloads the Q4_K_M 4-bit quantization, which compresses the model perfectly so it fits into your 8GB VRAM.
 
