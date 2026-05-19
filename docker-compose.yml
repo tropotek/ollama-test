@@ -25,7 +25,7 @@ services:
       resources:
         limits:
           cpus: '4.0'                # Cap CPU to prevent total system lockups
-          memory: 4G                 # Cap system RAM allocation
+          memory: 16G                 # Cap system RAM allocation
         reservations:
           devices:
             - driver: nvidia
