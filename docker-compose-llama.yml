@@ -20,17 +20,18 @@ services:
       --host 0.0.0.0
       --port 8080
       --n-gpu-layers 99
-      --ctx-size 8192
+      --ctx-size 4096
       -fa on
       -np 1
 #      --spec-type draft-mtp
 #      --spec-draft-n-max 2
+#      --ctx-size 8192
 #      --ctx-size 32645
 #      --ctx-size 16216
-#      --ctx-size 4096
+#      --ctx-size
 #      --model /models/qwen3-8b-q4_k_m.gguf
 #      --model /models/Qwen3.5-9B-UD-Q4_K_XL.gguf
-  
+
 
 
 # TODO: do not enable yet. Looks like it is better to run this on the host for now???
