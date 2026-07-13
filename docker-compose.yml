@@ -10,11 +10,11 @@ services:
       - ./:/projects
       - ./ollama:/root/.ollama
     restart: unless-stopped
-    #environment:
+    environment:
     #  - OLLAMA_CONTEXT_LENGTH=32768
     #  - OLLAMA_CONTEXT_LENGTH=16384
     #  - OLLAMA_CONTEXT_LENGTH=8192
-    #  - OLLAMA_CONTEXT_LENGTH=4096
+      - OLLAMA_CONTEXT_LENGTH=4096
     #  - OLLAMA_CONTEXT_LENGTH=2043
     # enable for older CPU only machines (no GPU)
     # cpus: 8
@@ -61,6 +61,22 @@ services:
       retries: 3
       start_period: 20s
 
+  kokoro-tts:
+    image: ghcr.io/remsky/kokoro-fastapi-gpu:latest
+    container_name: kokoro-tts
+    ports:
+      - "${KOKORO_PORT:-8880}:8880"
+    volumes:
+      - kokoro-voices:/app/voices
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    restart: unless-stopped
+
   # enable searxng in Admin Web search settings URL: `http://searxng:8081/search?q=<query>`
   searxng:
     image: searxng/searxng:latest
@@ -106,3 +122,4 @@ services:
 volumes:
   searxng_data:
   open-terminal:
+  kokoro-voices:
