@@ -1,3 +1,5 @@
+name: llama
+
 services:
   llama-cpp:
     image: ghcr.io/ggml-org/llama.cpp:full-cuda  # Official CUDA-enabled image
@@ -15,47 +17,48 @@ services:
               count: 1
               capabilities: [ gpu ] # Crucial for RTX 2060 passthrough
     entrypoint: ["/app/llama-server"]
+    # https://huggingface.co/deepreinforce-ai/Ornith-1.0-9B-GGUF/blob/main/ornith-1.0-9b-Q4_K_M.gguf
+    # ornith-1.0-9b is a Qwen3.5 hybrid attention/SSM (mamba) model - only 8 of its 32
+    # layers keep a real KV cache, so context scales cheaply vs a plain transformer.
+    # Tuned for RTX 2060 Super (8Gb, ~6.5Gb free): full GPU offload + 16k ctx + q8_0
+    # KV cache leaves ~1Gb headroom for other GPU consumers (kokoro-tts, desktop, etc).
+    # --jinja renders the model's own tool-call template/grammar so tool calls come
+    # back as structured tool_calls instead of raw text - required for opencode.
     command: >
-      --model /models/qwen3-8b-q4_k_m.gguf
+      --model /models/ornith-1.0-9b-Q4_K_M.gguf
       --host 0.0.0.0
       --port 8080
       --n-gpu-layers 99
-      --ctx-size 4096
+      --ctx-size 65536
+      --cache-type-k q8_0
+      --cache-type-v q8_0
       -fa on
       -np 1
-#      --spec-type draft-mtp
-#      --spec-draft-n-max 2
-#      --ctx-size 8192
-#      --ctx-size 32645
-#      --ctx-size 16216
-#      --ctx-size
-#      --model /models/qwen3-8b-q4_k_m.gguf
-#      --model /models/Qwen3.5-9B-UD-Q4_K_XL.gguf
+      --jinja
 
-
-
-# TODO: do not enable yet. Looks like it is better to run this on the host for now???
-#  opencode:
-#    image: ghcr.io/opencode-ai/opencode:latest
-#    container_name: opencode-agent
-#    restart: unless-stopped
-#    volumes:
-#      # Mount your project code so OpenCode can read/edit it
-#      - ./:/workspace
-#      # Optional: Persist OpenCode configuration and authentication
-#      - ./docker/opencode.json:/home/op/.config/opencode
-#      - /root/.cache/ollama:/root/.cache/ollama
-#      - /root/.local/share/ollama:/root/.local/share/ollama
-#    working_dir: /workspace
-#    ports:
-#      - "${OPENCODE_PORT:-1234}:1234"  # Port for the OpenCode server
-#    environment:
-#      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
-#      - OLLAMA_BASE_URL=http://ollama:11434/v1
-#    tty: true
-#    stdin_open: true
-#    command: opencode serve --port 1234
-#    depends_on:
-#      ollama:
-#        condition: service_started
+    # --- Qwen3.6-27B-Q4_K_M config - commented out for now ---
+    # Same Qwen3.5-style hybrid attention/SSM architecture as ornith, but bigger -
+    # 65 layers, only 16 full-attention (every 4th layer), rest are Mamba/SSM
+    # layers whose state doesn't grow with context. ~16Gb on disk, well over the
+    # RTX 2060 Super's 8Gb VRAM, so it needs a CPU/GPU split (this box's CPU is an
+    # old i7-3770, so it's very slow: ~0.3-0.4 tok/s with 45/65 layers on CPU -
+    # tested and confirmed working but too slow for real opencode use).
+    # --n-gpu-layers 20 puts ~20 layers (~4.7Gb weights) on GPU; tested at 8Gb VRAM
+    # it left only ~1Gb free (tighter than expected - KV cache/buffers add up).
+    # NOTE: an earlier attempt used --n-gpu-layers 99 (full offload) with this
+    # model and hung the machine trying to fit ~16Gb of weights into 8Gb VRAM -
+    # if you revisit this, keep n-gpu-layers capped and raise gradually while
+    # watching `nvidia-smi`.
+    # command: >
+    #   --model /models/Qwen3.6-27B-Q4_K_M.gguf
+    #   --host 0.0.0.0
+    #   --port 8080
+    #   --n-gpu-layers 20
+    #   --ctx-size 32768
+    #   --cache-type-k q8_0
+    #   --cache-type-v q8_0
+    #   -fa on
+    #   -np 1
+    #   --threads 8
+    #   --jinja
 
