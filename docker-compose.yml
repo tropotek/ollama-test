@@ -61,21 +61,31 @@ services:
       retries: 3
       start_period: 20s
 
-  kokoro-tts:
-    image: ghcr.io/remsky/kokoro-fastapi-gpu:latest
-    container_name: kokoro-tts
-    ports:
-      - "${KOKORO_PORT:-8880}:8880"
-    volumes:
-      - kokoro-voices:/app/voices
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: all
-              capabilities: [gpu]
-    restart: unless-stopped
+# Getting errors for kokoro
+#  RuntimeError:
+#    Warmup failed:
+#      Failed to load model:
+#        Failed to load Kokoro model:
+#          CUDA error: no kernel image is available for execution on the device
+#  2026-07-13T02:32:55.967730061Z CUDA kernel errors might be asynchronously reported at some other API call, so the stacktrace below might be incorrect.
+#  2026-07-13T02:32:55.967731914Z For debugging consider passing CUDA_LAUNCH_BLOCKING=1
+#  2026-07-13T02:32:55.967733584Z Compile with `TORCH_USE_CUDA_DSA` to enable device-side assertions.
+
+#  kokoro-tts:
+#    image: ghcr.io/remsky/kokoro-fastapi-gpu:latest
+#    container_name: kokoro-tts
+#    ports:
+#      - "${KOKORO_PORT:-8880}:8880"
+#    volumes:
+#      - kokoro-voices:/app/voices
+#    deploy:
+#      resources:
+#        reservations:
+#          devices:
+#            - driver: nvidia
+#              count: all
+#              capabilities: [gpu]
+#    restart: unless-stopped
 
   # enable searxng in Admin Web search settings URL: `http://searxng:8081/search?q=<query>`
   searxng:
