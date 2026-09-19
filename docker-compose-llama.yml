@@ -17,24 +17,82 @@ services:
               count: 1
               capabilities: [ gpu ] # Crucial for RTX 2060 passthrough
     entrypoint: ["/app/llama-server"]
-    # https://huggingface.co/deepreinforce-ai/Ornith-1.0-9B-GGUF/blob/main/ornith-1.0-9b-Q4_K_M.gguf
-    # ornith-1.0-9b is a Qwen3.5 hybrid attention/SSM (mamba) model - only 8 of its 32
-    # layers keep a real KV cache, so context scales cheaply vs a plain transformer.
-    # Tuned for RTX 2060 Super (8Gb, ~6.5Gb free): full GPU offload + 16k ctx + q8_0
-    # KV cache leaves ~1Gb headroom for other GPU consumers (kokoro-tts, desktop, etc).
     # --jinja renders the model's own tool-call template/grammar so tool calls come
     # back as structured tool_calls instead of raw text - required for opencode.
+    # --alias sets the id reported by /v1/models, matching the model key clients send.
+
+    # https://huggingface.co/unsloth/Qwen3-Coder-30B-A3B-Instruct-GGUF
+    # Qwen3-Coder-30B-A3B UD-Q3_K_XL: 13.8Gb, 48 layers, 128 experts, 8 active per
+    # token. --n-cpu-moe 32 holds 32 layers' routed experts in system RAM and the
+    # rest plus attention/KV on the GPU (~7.4Gb of 8Gb); raise it to free VRAM,
+    # lower it for speed while watching `nvidia-smi`. ~10 tok/s, RAM bandwidth bound.
     command: >
-      --model /models/ornith-1.0-9b-Q4_K_M.gguf
+      --model /models/Qwen3-Coder-30B-A3B-Instruct-UD-Q3_K_XL.gguf
+      --alias Qwen3-Coder-30B-A3B-Instruct-UD-Q3_K_XL.gguf
       --host 0.0.0.0
       --port 8080
       --n-gpu-layers 99
-      --ctx-size 65536
+      --n-cpu-moe 32
+      --ctx-size 32768
       --cache-type-k q8_0
       --cache-type-v q8_0
       -fa on
       -np 1
+      --threads 8
       --jinja
+
+    # --- Qwen3-4B-Instruct-2507-Q8_0 config - commented out for now ---
+    # https://huggingface.co/unsloth/Qwen3-4B-Instruct-2507-GGUF
+    # 4.28Gb weights, 36 layers, native 256k context. All 36 layers keep a KV cache
+    # (~72Kb/token at q8_0), so 32k ctx is ~2.4Gb, landing around 7.5Gb of the card.
+    # command: >
+    #   --model /models/Qwen3-4B-Instruct-2507-Q8_0.gguf
+    #   --alias Qwen3-4B-Instruct-2507-Q8_0.gguf
+    #   --host 0.0.0.0
+    #   --port 8080
+    #   --n-gpu-layers 99
+    #   --ctx-size 32768
+    #   --cache-type-k q8_0
+    #   --cache-type-v q8_0
+    #   -fa on
+    #   -np 1
+    #   --jinja
+
+    # --- Qwen2.5-Coder-7B-Q6_K config - commented out for now ---
+    # https://huggingface.co/bartowski/Qwen2.5-Coder-7B-Instruct-GGUF
+    # 6.25Gb weights, 28 layers, native 32k context. Emits tool calls as raw text
+    # instead of <tool_call> tags, so opencode cannot execute them - chat use only.
+    # command: >
+    #   --model /models/Qwen2.5-Coder-7B-Instruct-Q6_K.gguf
+    #   --alias Qwen2.5-Coder-7B-Instruct-Q6_K.gguf
+    #   --host 0.0.0.0
+    #   --port 8080
+    #   --n-gpu-layers 99
+    #   --ctx-size 32768
+    #   --cache-type-k q8_0
+    #   --cache-type-v q8_0
+    #   -fa on
+    #   -np 1
+    #   --jinja
+
+    # --- ornith-1.0-9b-Q4_K_M config - commented out for now ---
+    # https://huggingface.co/deepreinforce-ai/Ornith-1.0-9B-GGUF/blob/main/ornith-1.0-9b-Q4_K_M.gguf
+    # ornith-1.0-9b is a Qwen3.5 hybrid attention/SSM (mamba) model - only 8 of its 32
+    # layers keep a real KV cache, so context scales cheaply vs a plain transformer.
+    # Tuned for RTX 2060 Super (8Gb, ~6.5Gb free): full GPU offload + 64k ctx + q8_0
+    # KV cache leaves ~1Gb headroom for other GPU consumers (kokoro-tts, desktop, etc).
+    # command: >
+    #   --model /models/ornith-1.0-9b-Q4_K_M.gguf
+    #   --alias ornith-1.0-9b-Q4_K_M.gguf
+    #   --host 0.0.0.0
+    #   --port 8080
+    #   --n-gpu-layers 99
+    #   --ctx-size 65536
+    #   --cache-type-k q8_0
+    #   --cache-type-v q8_0
+    #   -fa on
+    #   -np 1
+    #   --jinja
 
     # --- Qwen3.6-27B-Q4_K_M config - commented out for now ---
     # Same Qwen3.5-style hybrid attention/SSM architecture as ornith, but bigger -
@@ -51,6 +109,7 @@ services:
     # watching `nvidia-smi`.
     # command: >
     #   --model /models/Qwen3.6-27B-Q4_K_M.gguf
+    #   --alias Qwen3.6-27B-Q4_K_M.gguf
     #   --host 0.0.0.0
     #   --port 8080
     #   --n-gpu-layers 20
@@ -61,4 +120,3 @@ services:
     #   -np 1
     #   --threads 8
     #   --jinja
-
